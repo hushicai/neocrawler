@@ -2,11 +2,11 @@ var proxyManager = require('../models/proxyManagement.js');
 
 var proxyList = [];
 
-var template =  {
-        key:'',
-        address: '',
-        authorize: '',
-        group: ''};
+var template = {
+  key: '',
+  address: '',
+  authorize: '',
+  group: ''};
 
 PROXY_P_PREFIX = 'proxy:public:available:';
 PROXY_P_KEY1S = 'proxy:public:available:1s';
@@ -23,66 +23,64 @@ PROXY_V_KEY8S = 'proxy:vip:available:8s';
 PROXY_V_KEY15S = 'proxy:vip:available:15s';
 
 // index displaying all available proxy list
-exports.index = function(req, res) {
-   
-   proxyManager.getProxyList(function(err, result){
-     //proxyList = result;
-     proxyList = [];
+exports.index = function (req, res) {
+  proxyManager.getProxyList(function (err, result) {
+     // proxyList = result;
+    proxyList = [];
 //        console.log("proxy list:", result);
-       res.render('proxy/index', {title : 'Available Proxy List', proxyList:result});
-   });  
+    res.render('proxy/index', {title: 'Available Proxy List', proxyList: result});
+  });
 };
 
 // display new proxy form
-exports.new = function(req, res) {
-    var filePath = require('path').normalize(__dirname + "/../public/proxy/new.html");
-    res.sendfile(filePath);
+exports.new = function (req, res) {
+  var filePath = require('path').normalize(__dirname + '/../public/proxy/new.html');
+
+  res.sendfile(filePath);
 };
 
-exports.create = function(req, res) {
+exports.create = function (req, res) {
 //    console.log("address:", req.body.address);
 //    console.log("authorize:", req.body.authorize);
 //    console.log("group:", req.body.group);
 
-    var group = req.body.group;
-    var key;
-    if(group[0] === 'p'){
-      key = PROXY_P_PREFIX + group.substring(1);
-    }else{
-      key = PROXY_V_PREFIX + group.substring(1);
-    }
+  var group = req.body.group;
+  var key;
+
+  if (group[0] === 'p') {
+    key = PROXY_P_PREFIX + group.substring(1);
+  } else {
+    key = PROXY_V_PREFIX + group.substring(1);
+  }
 //    console.log("key:", key);
 
-    template['address'] = req.body.address;
-    template['authorize'] = req.body.authorize;
-    template['group'] = req.body.group;
-    template['key'] = key;
+  template['address'] = req.body.address;
+  template['authorize'] = req.body.authorize;
+  template['group'] = req.body.group;
+  template['key'] = key;
 
-    proxyManager.create(key, template['address'], function(err, result){
-        if(!err) {
-            
-         } 
-    });
-    res.redirect('proxy');
+  proxyManager.create(key, template['address'], function (err, result) {
+    if (!err) {
+
+    }
+  });
+  res.redirect('proxy');
 };
 
 // delete a widget
-exports.destroy = function(req,res) {
+exports.destroy = function (req, res) {
   var host = req.params.host;
   var key = req.params.key;
 
 //  console.log(host, key);
-  proxyManager.destroy(key, host, function(err, result){
-
+  proxyManager.destroy(key, host, function (err, result) {
 //        console.log('Host', host, 'deleted.');
-          
-        if(!err) {
-           
-                //console.log("list:", result);
-               
 
-         }  
-         res.redirect('proxy'); 
+    if (!err) {
+
+                // console.log("list:", result);
+
+    }
+    res.redirect('proxy');
   });
-
 };

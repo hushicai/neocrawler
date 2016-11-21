@@ -9,27 +9,29 @@ var request = require('request');
 var async = require('async');
 var httpRequest = require('../../lib/httpRequest.js');
 
-var spider_extend = function(spiderCore){
-    var self = this;
-    this.spiderCore = spiderCore;
-    logger = spiderCore.settings.logger;
+var spider_extend = function (spiderCore) {
+  var self = this;
 
-    var dbtype = 'redis';
-    if(this.spiderCore.settings['use_ssdb'])dbtype = 'ssdb';
+  this.spiderCore = spiderCore;
+  logger = spiderCore.settings.logger;
 
-    myredis.createClient(
+  var dbtype = 'redis';
+
+  if (this.spiderCore.settings['use_ssdb'])dbtype = 'ssdb';
+
+  myredis.createClient(
         this.spiderCore.settings['proxy_info_redis_db'][0],
         this.spiderCore.settings['proxy_info_redis_db'][1],
         this.spiderCore.settings['proxy_info_redis_db'][2],
         dbtype,
-        function(err,cli){
-            self.redis_cli = cli;
-            logger.debug('temporarily proxy redis db ready');
-     });
+        function (err, cli) {
+          self.redis_cli = cli;
+          logger.debug('temporarily proxy redis db ready');
+        });
 
-    this.no_queue_alert_count = 0;
-    this.myip = ''
-}
+  this.no_queue_alert_count = 0;
+  this.myip = '';
+};
 
 /**
  * DIY extract, it happens after spider framework extracted data.
@@ -64,135 +66,142 @@ var spider_extend = function(spiderCore){
     };
  * @returns {*}
  */
-//spider_extend.prototype.extract = function(extracted_info,callback){
+// spider_extend.prototype.extract = function(extracted_info,callback){
 //    callback(extracted_info);
-//}
+// }
 
 /**
  * instead of main framework content pipeline
  * if it do nothing , comment it
  * @param extracted_info (same to extract)
  */
-//spider_extend.prototype.pipeline = function(extracted_info){
+// spider_extend.prototype.pipeline = function(extracted_info){
 //    logger.debug('spider extender receive extracted info from '+extracted_info['url']);
-//}
+// }
 /**
  * report extracted data lacks of some fields
  */
-spider_extend.prototype.data_lack_alert = function(url,fields){
-    logger.error(url + ' lacks of :'+fields.join(' and '));
-}
+spider_extend.prototype.data_lack_alert = function (url, fields) {
+  logger.error(url + ' lacks of :' + fields.join(' and '));
+};
 
 /**
  * fetch proxy
  * @private
  */
-spider_extend.prototype.__fetchProxy = function(crawled_info){
-    var self = this;
-    if(crawled_info['extracted_data']){
-        var ips = crawled_info['extracted_data']['IP'];
-        //async queue/////////////////////////////////////////////////////////
-        var q = async.queue(function(task, callback) {
-            logger.debug('proxy checker: worker '+task.name+' is processing task: ');
-            task.run(callback);
-        }, 20);
-        q.saturated = function() {
-            //logger.debug('proxy checker: all workers to be used');
-        }
-        q.empty = function() {
-            //logger.debug('proxy checker: no more tasks wating');
-        }
-        q.drain = function() {
-            logger.debug('proxy checker: all tasks have been processed');
-        }
-        /////////////////////////////////////////////////////////////////////
-        //-------------------------------------------------------------------
-        for(var i=0;i<ips.length;i++){
-            (function(i,redis_cli){
-                q.push({name:'t'+i, run: function(cb){
-                    logger.debug('proxy checker: t'+i+' is running, waiting tasks: ', q.length());
-                    var ip = ips[i];
-                    if(typeof(ip)==='object'){
-                        ip = ip['host'].trim() + ':' + ip['port'].trim();
-                    }else ip = ip.trim();
-                    (function(ip,redis_cli){
-                        var startTime = (new Date()).getTime();
-                        request({
-                            'url': 'http://your.echo.server/',//echo server:http://echo.jsontest.com/key/value/one/two
-                            'headers': {
-                                "User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.57 Safari/537.36"
-                            },
-                            'timeout':60*1000,
-                            'proxy':'http://'+ip
-                        }, function(error, response, body){
-                            if (!error && response.statusCode == 200) {
-                                if(body.startsWith('{')){
-                                    try{
-                                        var info = JSON.parse(body);
-                                    }catch(e){
-                                        logger.error('proxy checker: json parse error: '+ip);
-                                        return cb();
-                                    };
+spider_extend.prototype.__fetchProxy = function (crawled_info) {
+  var self = this;
 
-                                    var available_proxy = true;
-                                    if(!info['IP']||!info['HEADERS'])available_proxy = false;
-                                    if(info['HEADERS']){
-                                        if(info['HEADERS']['REMOTE_ADDR']&&info['HEADERS']['REMOTE_ADDR']==self.myip)available_proxy = false;
-                                        if(info['HEADERS']['X-REAL-IP']&&info['HEADERS']['X-REAL-IP']==self.myip)available_proxy = false;
-                                        //strict mode
-                                        //if(info['HEADERS']['HTTP_VIA'])available_proxy = false;
-                                        //if(info['HEADERS']['HTTP_X_FORWARDED_FOR'])available_proxy = false;
-                                        //if(info['HEADERS']['X-FORWARDED-FOR'])available_proxy = false;
-                                        //if(info['HEADERS']['X-REAL-IP'])available_proxy = false;
-                                        if(info['HEADERS']['HTTP_X_FORWARDED_FOR']&&info['HEADERS']['HTTP_X_FORWARDED_FOR'].indexOf(self.myip)>0)available_proxy = false;
-                                        if(info['HEADERS']['X-FORWARDED-FOR']&&info['HEADERS']['X-FORWARDED-FOR'].indexOf(self.myip)>0)available_proxy = false;
-                                    }
+  if (crawled_info['extracted_data']) {
+    var ips = crawled_info['extracted_data']['IP'];
+        // async queue/////////////////////////////////////////////////////////
+    var q = async.queue(function (task, callback) {
+      logger.debug('proxy checker: worker ' + task.name + ' is processing task: ');
+      task.run(callback);
+    }, 20);
 
-                                    if(available_proxy){
-                                        var endTime = (new Date()).getTime();
-                                        if(endTime - startTime <= 60000){
-                                            redis_cli.lpush('proxy:public:available:3s',ip,function(err,value){
-                                                if(!err)logger.debug('proxy checker: Append a proxy: '+ip);
-                                                cb();
-                                            });
-                                        }else{
-                                            logger.warn('proxy checker: '+ip + ' took a long time: '+(endTime - startTime)+'ms, drop it');
-                                            cb();
-                                        }
-                                    }else {
-                                        logger.warn('proxy checker: ' +ip + ' is invalidate proxy!');
-                                        cb();
-                                    }
-                                }else cb();
-                            }else {logger.error('proxy checker: request error: '+ip);cb();}
-                        });
-                    })(ip,redis_cli);
-                }}, function(err) {
-                    //logger.debug('proxy checker: t'+i+' executed');
-                });
-            })(i,this.redis_cli);
-        }
-        //------------------------------------------------------------------------------
+    q.saturated = function () {
+            // logger.debug('proxy checker: all workers to be used');
+    };
+    q.empty = function () {
+            // logger.debug('proxy checker: no more tasks wating');
+    };
+    q.drain = function () {
+      logger.debug('proxy checker: all tasks have been processed');
+    };
+        // ///////////////////////////////////////////////////////////////////
+        // -------------------------------------------------------------------
+    for (var i = 0; i < ips.length; i++) {
+      (function (i, redis_cli) {
+        q.push({name: 't' + i, run: function (cb) {
+          logger.debug('proxy checker: t' + i + ' is running, waiting tasks: ', q.length());
+          var ip = ips[i];
+
+          if (typeof (ip) === 'object') {
+            ip = ip['host'].trim() + ':' + ip['port'].trim();
+          } else ip = ip.trim();
+          (function (ip, redis_cli) {
+            var startTime = (new Date()).getTime();
+
+            request({
+              'url': 'http://your.echo.server/', // echo server:http://echo.jsontest.com/key/value/one/two
+              'headers': {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.57 Safari/537.36'
+              },
+              'timeout': 60 * 1000,
+              'proxy': 'http://' + ip
+            }, function (error, response, body) {
+              if (!error && response.statusCode == 200) {
+                if (body.startsWith('{')) {
+                  try {
+                    var info = JSON.parse(body);
+                  } catch (e) {
+                    logger.error('proxy checker: json parse error: ' + ip);
+                    return cb();
+                  };
+
+                  var available_proxy = true;
+
+                  if (!info['IP'] || !info['HEADERS'])available_proxy = false;
+                  if (info['HEADERS']) {
+                    if (info['HEADERS']['REMOTE_ADDR'] && info['HEADERS']['REMOTE_ADDR'] == self.myip)available_proxy = false;
+                    if (info['HEADERS']['X-REAL-IP'] && info['HEADERS']['X-REAL-IP'] == self.myip)available_proxy = false;
+                                        // strict mode
+                                        // if(info['HEADERS']['HTTP_VIA'])available_proxy = false;
+                                        // if(info['HEADERS']['HTTP_X_FORWARDED_FOR'])available_proxy = false;
+                                        // if(info['HEADERS']['X-FORWARDED-FOR'])available_proxy = false;
+                                        // if(info['HEADERS']['X-REAL-IP'])available_proxy = false;
+                    if (info['HEADERS']['HTTP_X_FORWARDED_FOR'] && info['HEADERS']['HTTP_X_FORWARDED_FOR'].indexOf(self.myip) > 0)available_proxy = false;
+                    if (info['HEADERS']['X-FORWARDED-FOR'] && info['HEADERS']['X-FORWARDED-FOR'].indexOf(self.myip) > 0)available_proxy = false;
+                  }
+
+                  if (available_proxy) {
+                    var endTime = (new Date()).getTime();
+                    if (endTime - startTime <= 60000) {
+                        redis_cli.lpush('proxy:public:available:3s', ip, function (err, value) {
+                            if (!err)logger.debug('proxy checker: Append a proxy: ' + ip);
+                            cb();
+                          });
+                      } else {
+                        logger.warn('proxy checker: ' + ip + ' took a long time: ' + (endTime - startTime) + 'ms, drop it');
+                        cb();
+                      }
+                  } else {
+                    logger.warn('proxy checker: ' + ip + ' is invalidate proxy!');
+                    cb();
+                  }
+                } else cb();
+              } else { logger.error('proxy checker: request error: ' + ip); cb(); }
+            });
+          })(ip, redis_cli);
+        }}, function (err) {
+                    // logger.debug('proxy checker: t'+i+' executed');
+        });
+      })(i, this.redis_cli);
     }
-}
+        // ------------------------------------------------------------------------------
+  }
+};
 /**
  * report a url crawling finish
  * @param crawled_info
  */
-spider_extend.prototype.crawl_finish_alert = function(crawled_info){
-    var self = this;
-    if(self.myip)self.__fetchProxy(crawled_info);
-    else{
-        httpRequest.request('http://your.echo.server/',null,null,null,30,false,function(err,status_code,content,page_encoding){
-                if(err)throw err;
-                else{
-                    var content_json = JSON.parse(content);
-                    self.myip = content_json['IP'];
-                    self.__fetchProxy(crawled_info);
-                }
-        });
-    }
-}
+spider_extend.prototype.crawl_finish_alert = function (crawled_info) {
+  var self = this;
+
+  if (self.myip)self.__fetchProxy(crawled_info);
+  else {
+    httpRequest.request('http://your.echo.server/', null, null, null, 30, false, function (err, status_code, content, page_encoding) {
+      if (err) throw err;
+      else {
+        var content_json = JSON.parse(content);
+
+        self.myip = content_json['IP'];
+        self.__fetchProxy(crawled_info);
+      }
+    });
+  }
+};
 /**
  * report no queue
  */
@@ -266,7 +275,6 @@ spider_extend.prototype.no_queue_alert = function(){
                 function(err, results){
                     // results is now equal to ['one', 'two']
                 });
-
 
         }
     });
