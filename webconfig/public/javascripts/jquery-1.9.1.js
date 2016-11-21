@@ -8173,9 +8173,9 @@
 
 								// Otherwise, insert the intermediate dataType
                   } else if (converters[ conv2 ] !== true) {
-                  current = tmp[ 0 ];
-                  dataTypes.splice(i--, 0, current);
-                }
+                    current = tmp[ 0 ];
+                    dataTypes.splice(i--, 0, current);
+                  }
 
                   break;
                 }
@@ -8481,16 +8481,16 @@
                   if (handle) {
                     xhr.onreadystatechange = jQuery.noop;
                     if (xhrOnUnloadAbort) {
-                    delete xhrCallbacks[ handle ];
-                  }
+                      delete xhrCallbacks[ handle ];
+                    }
                   }
 
 								// If it's an abort
                   if (isAbort) {
 									// Abort it manually if needed
                     if (xhr.readyState !== 4) {
-                    xhr.abort();
-                  }
+                      xhr.abort();
+                    }
                   } else {
                     responses = {};
                     status = xhr.status;
@@ -8499,17 +8499,17 @@
 									// When requesting binary data, IE6-9 will throw an exception
 									// on any attempt to access responseText (#11426)
                     if (typeof xhr.responseText === 'string') {
-                    responses.text = xhr.responseText;
-                  }
+                      responses.text = xhr.responseText;
+                    }
 
 									// Firefox throws an exception when accessing
 									// statusText for faulty cross-domain requests
                     try {
-                    statusText = xhr.statusText;
-                  } catch (e) {
+                      statusText = xhr.statusText;
+                    } catch (e) {
 										// We normalize with Webkit giving an empty statusText
-                    statusText = '';
-                  }
+                      statusText = '';
+                    }
 
 									// Filter status for non standard behaviors
 
@@ -8517,11 +8517,11 @@
 									// (success with no data won't get notified, that's the best we
 									// can do given current implementations)
                     if (!status && s.isLocal && !s.crossDomain) {
-                    status = responses.text ? 200 : 404;
+                      status = responses.text ? 200 : 404;
 									// IE - #1450: sometimes returns 1223 when it should be 204
-                  } else if (status === 1223) {
-                  status = 204;
-                }
+                    } else if (status === 1223) {
+                      status = 204;
+                    }
                   }
                 }
               } catch (firefoxAccessException) {

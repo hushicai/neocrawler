@@ -3257,121 +3257,121 @@
         var lastNode = this._lastNode();
 
         if (lastNode) {
-        lastNode.focus(Node.focusElement || this._getElementName(target));
-      }
+          lastNode.focus(Node.focusElement || this._getElementName(target));
+        }
         handled = true;
       }
     } else if (keynum == 36) { // Home
       if (altKey) { // Alt+Home
       // find the first node
-      var firstNode = this._firstNode();
+        var firstNode = this._firstNode();
 
-      if (firstNode) {
-        firstNode.focus(Node.focusElement || this._getElementName(target));
+        if (firstNode) {
+          firstNode.focus(Node.focusElement || this._getElementName(target));
+        }
+        handled = true;
       }
-      handled = true;
-    }
     } else if (keynum == 37) {        // Arrow Left
-    if (altKey && !shiftKey) {  // Alt + Arrow Left
+      if (altKey && !shiftKey) {  // Alt + Arrow Left
       // move to left element
-      var prevElement = this._previousElement(target);
+        var prevElement = this._previousElement(target);
 
-      if (prevElement) {
-        this.focus(this._getElementName(prevElement));
-      }
-      handled = true;
-    } else if (altKey && shiftKey) { // Alt + Shift Arrow left
-      if (this.expanded) {
-        var appendDom = this.getAppend();
+        if (prevElement) {
+          this.focus(this._getElementName(prevElement));
+        }
+        handled = true;
+      } else if (altKey && shiftKey) { // Alt + Shift Arrow left
+        if (this.expanded) {
+          var appendDom = this.getAppend();
 
-        nextDom = appendDom ? appendDom.nextSibling : undefined;
-      } else {
-        var dom = this.getDom();
+          nextDom = appendDom ? appendDom.nextSibling : undefined;
+        } else {
+          var dom = this.getDom();
 
-        nextDom = dom.nextSibling;
-      }
-      if (nextDom) {
-        nextNode = Node.getNodeFromTarget(nextDom);
-        nextDom2 = nextDom.nextSibling;
-        nextNode2 = Node.getNodeFromTarget(nextDom2);
-        if (nextNode && nextNode instanceof AppendNode &&
+          nextDom = dom.nextSibling;
+        }
+        if (nextDom) {
+          nextNode = Node.getNodeFromTarget(nextDom);
+          nextDom2 = nextDom.nextSibling;
+          nextNode2 = Node.getNodeFromTarget(nextDom2);
+          if (nextNode && nextNode instanceof AppendNode &&
             !(this.parent.childs.length == 1) &&
             nextNode2 && nextNode2.parent) {
-          nextNode2.parent.moveBefore(this, nextNode2);
-          this.focus(Node.focusElement || this._getElementName(target));
+            nextNode2.parent.moveBefore(this, nextNode2);
+            this.focus(Node.focusElement || this._getElementName(target));
+          }
         }
       }
-    }
-  } else if (keynum == 38) {        // Arrow Up
-    if (altKey && !shiftKey) {  // Alt + Arrow Up
+    } else if (keynum == 38) {        // Arrow Up
+      if (altKey && !shiftKey) {  // Alt + Arrow Up
       // find the previous node
-      prevNode = this._previousNode();
-      if (prevNode) {
-        prevNode.focus(Node.focusElement || this._getElementName(target));
-      }
-      handled = true;
-    } else if (altKey && shiftKey) { // Alt + Shift + Arrow Up
+        prevNode = this._previousNode();
+        if (prevNode) {
+          prevNode.focus(Node.focusElement || this._getElementName(target));
+        }
+        handled = true;
+      } else if (altKey && shiftKey) { // Alt + Shift + Arrow Up
       // find the previous node
-      prevNode = this._previousNode();
-      if (prevNode && prevNode.parent) {
-        prevNode.parent.moveBefore(this, prevNode);
-        this.focus(Node.focusElement || this._getElementName(target));
-      }
-      handled = true;
-    }
-  } else if (keynum == 39) {        // Arrow Right
-    if (altKey && !shiftKey) {  // Alt + Arrow Right
-      // move to right element
-      var nextElement = this._nextElement(target);
-
-      if (nextElement) {
-        this.focus(this._getElementName(nextElement));
-      }
-      handled = true;
-    } else if (altKey && shiftKey) { // Alt + Shift Arrow Right
-      dom = this.getDom();
-      var prevDom = dom.previousSibling;
-
-      if (prevDom) {
-        prevNode = Node.getNodeFromTarget(prevDom);
-        if (prevNode && prevNode.parent &&
-            (prevNode instanceof AppendNode)
-            && !prevNode.isVisible()) {
+        prevNode = this._previousNode();
+        if (prevNode && prevNode.parent) {
           prevNode.parent.moveBefore(this, prevNode);
           this.focus(Node.focusElement || this._getElementName(target));
         }
+        handled = true;
       }
-    }
-  } else if (keynum == 40) {        // Arrow Down
-    if (altKey && !shiftKey) {  // Alt + Arrow Down
-      // find the next node
-      nextNode = this._nextNode();
-      if (nextNode) {
-        nextNode.focus(Node.focusElement || this._getElementName(target));
-      }
-      handled = true;
-    } else if (altKey && shiftKey) { // Alt + Shift + Arrow Down
-      // find the 2nd next node and move before that one
-      if (this.expanded) {
-        nextNode = this.append ? this.append._nextNode() : undefined;
-      } else {
-        nextNode = this._nextNode();
-      }
-      nextDom = nextNode ? nextNode.getDom() : undefined;
-      if (this.parent.childs.length == 1) {
-        nextDom2 = nextDom;
-      } else {
-        nextDom2 = nextDom ? nextDom.nextSibling : undefined;
-      }
-      var nextNode2 = Node.getNodeFromTarget(nextDom2);
+    } else if (keynum == 39) {        // Arrow Right
+      if (altKey && !shiftKey) {  // Alt + Arrow Right
+      // move to right element
+        var nextElement = this._nextElement(target);
 
-      if (nextNode2 && nextNode2.parent) {
-        nextNode2.parent.moveBefore(this, nextNode2);
-        this.focus(Node.focusElement || this._getElementName(target));
+        if (nextElement) {
+          this.focus(this._getElementName(nextElement));
+        }
+        handled = true;
+      } else if (altKey && shiftKey) { // Alt + Shift Arrow Right
+        dom = this.getDom();
+        var prevDom = dom.previousSibling;
+
+        if (prevDom) {
+          prevNode = Node.getNodeFromTarget(prevDom);
+          if (prevNode && prevNode.parent &&
+            (prevNode instanceof AppendNode)
+            && !prevNode.isVisible()) {
+            prevNode.parent.moveBefore(this, prevNode);
+            this.focus(Node.focusElement || this._getElementName(target));
+          }
+        }
       }
-      handled = true;
+    } else if (keynum == 40) {        // Arrow Down
+      if (altKey && !shiftKey) {  // Alt + Arrow Down
+      // find the next node
+        nextNode = this._nextNode();
+        if (nextNode) {
+          nextNode.focus(Node.focusElement || this._getElementName(target));
+        }
+        handled = true;
+      } else if (altKey && shiftKey) { // Alt + Shift + Arrow Down
+      // find the 2nd next node and move before that one
+        if (this.expanded) {
+          nextNode = this.append ? this.append._nextNode() : undefined;
+        } else {
+          nextNode = this._nextNode();
+        }
+        nextDom = nextNode ? nextNode.getDom() : undefined;
+        if (this.parent.childs.length == 1) {
+          nextDom2 = nextDom;
+        } else {
+          nextDom2 = nextDom ? nextDom.nextSibling : undefined;
+        }
+        var nextNode2 = Node.getNodeFromTarget(nextDom2);
+
+        if (nextNode2 && nextNode2.parent) {
+          nextNode2.parent.moveBefore(this, nextNode2);
+          this.focus(Node.focusElement || this._getElementName(target));
+        }
+        handled = true;
+      }
     }
-  }
 
     if (handled) {
       event.preventDefault();

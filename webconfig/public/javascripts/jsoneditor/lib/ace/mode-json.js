@@ -67,23 +67,23 @@ define('ace/mode/json', ['require', 'exports', 'module', 'ace/lib/oop', 'ace/mod
           var l = u.substring(s.column, s.column + 1);
 
           if (l == '}') {
-           var c = r.$findOpeningBracket('}', {column: s.column + 1, row: s.row});
+            var c = r.$findOpeningBracket('}', {column: s.column + 1, row: s.row});
 
-           if (c !== null && m.isAutoInsertedClosing(s, u, i)) return m.popAutoInsertedClosing(), {text: '', selection: [1, 1]};
-         }
+            if (c !== null && m.isAutoInsertedClosing(s, u, i)) return m.popAutoInsertedClosing(), {text: '', selection: [1, 1]};
+          }
         } else if (i == '\n' || i == '\r\n') {
-         var p = '';
+          var p = '';
 
-         m.isMaybeInsertedClosing(s, u) && (p = o.stringRepeat('}', h), m.clearMaybeInsertedClosing()); var l = u.substring(s.column, s.column + 1);
+          m.isMaybeInsertedClosing(s, u) && (p = o.stringRepeat('}', h), m.clearMaybeInsertedClosing()); var l = u.substring(s.column, s.column + 1);
 
-         if (l == '}' || p !== '') {
-      var d = r.findMatchingBracket({row: s.row, column: s.column}, '}');
+          if (l == '}' || p !== '') {
+            var d = r.findMatchingBracket({row: s.row, column: s.column}, '}');
 
-      if (!d) return null; var v = this.getNextLineIndent(e, u.substring(0, s.column), r.getTabString()), g = this.$getIndent(u);
+            if (!d) return null; var v = this.getNextLineIndent(e, u.substring(0, s.column), r.getTabString()), g = this.$getIndent(u);
 
-      return {text: '\n' + v + '\n' + g + p, selection: [1, v.length, 1, v.length]};
-    }
-       }
+            return {text: '\n' + v + '\n' + g + p, selection: [1, v.length, 1, v.length]};
+          }
+        }
       }), this.add('braces', 'deletion', function (e, t, n, r, i) {
         var s = r.doc.getTextRange(i);
 
@@ -94,71 +94,71 @@ define('ace/mode/json', ['require', 'exports', 'module', 'ace/lib/oop', 'ace/mod
         }
       }), this.add('parens', 'insertion', function (e, t, n, r, i) {
         if (i == '(') {
-         var s = n.getSelectionRange(), o = r.doc.getTextRange(s);
+          var s = n.getSelectionRange(), o = r.doc.getTextRange(s);
 
-         if (o !== '' && n.getWrapBehavioursEnabled()) return {text: '(' + o + ')', selection: !1}; if (m.isSaneInsertion(n, r)) return m.recordAutoInsert(n, r, ')'), {text: '()', selection: [1, 1]};
-       } else if (i == ')') {
-    var u = n.getCursorPosition(), a = r.doc.getLine(u.row), f = a.substring(u.column, u.column + 1);
+          if (o !== '' && n.getWrapBehavioursEnabled()) return {text: '(' + o + ')', selection: !1}; if (m.isSaneInsertion(n, r)) return m.recordAutoInsert(n, r, ')'), {text: '()', selection: [1, 1]};
+        } else if (i == ')') {
+          var u = n.getCursorPosition(), a = r.doc.getLine(u.row), f = a.substring(u.column, u.column + 1);
 
-    if (f == ')') {
-      var l = r.$findOpeningBracket(')', {column: u.column + 1, row: u.row});
+          if (f == ')') {
+            var l = r.$findOpeningBracket(')', {column: u.column + 1, row: u.row});
 
-      if (l !== null && m.isAutoInsertedClosing(u, a, i)) return m.popAutoInsertedClosing(), {text: '', selection: [1, 1]};
-    }
-  }
+            if (l !== null && m.isAutoInsertedClosing(u, a, i)) return m.popAutoInsertedClosing(), {text: '', selection: [1, 1]};
+          }
+        }
       }), this.add('parens', 'deletion', function (e, t, n, r, i) {
-       var s = r.doc.getTextRange(i);
+        var s = r.doc.getTextRange(i);
 
-       if (!i.isMultiLine() && s == '(') {
-    var o = r.doc.getLine(i.start.row), u = o.substring(i.start.column + 1, i.start.column + 2);
+        if (!i.isMultiLine() && s == '(') {
+          var o = r.doc.getLine(i.start.row), u = o.substring(i.start.column + 1, i.start.column + 2);
 
-    if (u == ')') return i.end.column++, i;
-  }
-     }), this.add('brackets', 'insertion', function (e, t, n, r, i) {
-  if (i == '[') {
-    var s = n.getSelectionRange(), o = r.doc.getTextRange(s);
+          if (u == ')') return i.end.column++, i;
+        }
+      }), this.add('brackets', 'insertion', function (e, t, n, r, i) {
+        if (i == '[') {
+          var s = n.getSelectionRange(), o = r.doc.getTextRange(s);
 
-    if (o !== '' && n.getWrapBehavioursEnabled()) return {text: '[' + o + ']', selection: !1}; if (m.isSaneInsertion(n, r)) return m.recordAutoInsert(n, r, ']'), {text: '[]', selection: [1, 1]};
-  } else if (i == ']') {
-    var u = n.getCursorPosition(), a = r.doc.getLine(u.row), f = a.substring(u.column, u.column + 1);
+          if (o !== '' && n.getWrapBehavioursEnabled()) return {text: '[' + o + ']', selection: !1}; if (m.isSaneInsertion(n, r)) return m.recordAutoInsert(n, r, ']'), {text: '[]', selection: [1, 1]};
+        } else if (i == ']') {
+          var u = n.getCursorPosition(), a = r.doc.getLine(u.row), f = a.substring(u.column, u.column + 1);
 
-    if (f == ']') {
-      var l = r.$findOpeningBracket(']', {column: u.column + 1, row: u.row});
+          if (f == ']') {
+            var l = r.$findOpeningBracket(']', {column: u.column + 1, row: u.row});
 
-      if (l !== null && m.isAutoInsertedClosing(u, a, i)) return m.popAutoInsertedClosing(), {text: '', selection: [1, 1]};
-    }
-  }
-}), this.add('brackets', 'deletion', function (e, t, n, r, i) {
-  var s = r.doc.getTextRange(i);
+            if (l !== null && m.isAutoInsertedClosing(u, a, i)) return m.popAutoInsertedClosing(), {text: '', selection: [1, 1]};
+          }
+        }
+      }), this.add('brackets', 'deletion', function (e, t, n, r, i) {
+        var s = r.doc.getTextRange(i);
 
-  if (!i.isMultiLine() && s == '[') {
-    var o = r.doc.getLine(i.start.row), u = o.substring(i.start.column + 1, i.start.column + 2);
+        if (!i.isMultiLine() && s == '[') {
+          var o = r.doc.getLine(i.start.row), u = o.substring(i.start.column + 1, i.start.column + 2);
 
-    if (u == ']') return i.end.column++, i;
-  }
-}), this.add('string_dquotes', 'insertion', function (e, t, n, r, i) {
-  if (i == '"' || i == "'") {
-    var s = i, o = n.getSelectionRange(), u = r.doc.getTextRange(o);
+          if (u == ']') return i.end.column++, i;
+        }
+      }), this.add('string_dquotes', 'insertion', function (e, t, n, r, i) {
+        if (i == '"' || i == "'") {
+          var s = i, o = n.getSelectionRange(), u = r.doc.getTextRange(o);
 
-    if (u !== '' && u !== "'" && u != '"' && n.getWrapBehavioursEnabled()) return {text: s + u + s, selection: !1}; var a = n.getCursorPosition(), f = r.doc.getLine(a.row), l = f.substring(a.column - 1, a.column);
+          if (u !== '' && u !== "'" && u != '"' && n.getWrapBehavioursEnabled()) return {text: s + u + s, selection: !1}; var a = n.getCursorPosition(), f = r.doc.getLine(a.row), l = f.substring(a.column - 1, a.column);
 
-    if (l == '\\') return null; var c = r.getTokens(o.start.row), h = 0, p, d = -1;
+          if (l == '\\') return null; var c = r.getTokens(o.start.row), h = 0, p, d = -1;
 
-    for (var v = 0; v < c.length; v++) { p = c[v], p.type == 'string' ? d = -1 : d < 0 && (d = p.value.indexOf(s)); if (p.value.length + h > o.start.column) break; h += c[v].value.length; } if (!p || d < 0 && p.type !== 'comment' && (p.type !== 'string' || o.start.column !== p.value.length + h - 1 && p.value.lastIndexOf(s) === p.value.length - 1)) { if (!m.isSaneInsertion(n, r)) return; return {text: s + s, selection: [1, 1]}; } if (p && p.type === 'string') {
-      var g = f.substring(a.column, a.column + 1);
+          for (var v = 0; v < c.length; v++) { p = c[v], p.type == 'string' ? d = -1 : d < 0 && (d = p.value.indexOf(s)); if (p.value.length + h > o.start.column) break; h += c[v].value.length; } if (!p || d < 0 && p.type !== 'comment' && (p.type !== 'string' || o.start.column !== p.value.length + h - 1 && p.value.lastIndexOf(s) === p.value.length - 1)) { if (!m.isSaneInsertion(n, r)) return; return {text: s + s, selection: [1, 1]}; } if (p && p.type === 'string') {
+            var g = f.substring(a.column, a.column + 1);
 
-      if (g == s) return {text: '', selection: [1, 1]};
-    }
-  }
-}), this.add('string_dquotes', 'deletion', function (e, t, n, r, i) {
-  var s = r.doc.getTextRange(i);
+            if (g == s) return {text: '', selection: [1, 1]};
+          }
+        }
+      }), this.add('string_dquotes', 'deletion', function (e, t, n, r, i) {
+        var s = r.doc.getTextRange(i);
 
-  if (!i.isMultiLine() && (s == '"' || s == "'")) {
-    var o = r.doc.getLine(i.start.row), u = o.substring(i.start.column + 1, i.start.column + 2);
+        if (!i.isMultiLine() && (s == '"' || s == "'")) {
+          var o = r.doc.getLine(i.start.row), u = o.substring(i.start.column + 1, i.start.column + 2);
 
-    if (u == s) return i.end.column++, i;
-  }
-});
+          if (u == s) return i.end.column++, i;
+        }
+      });
     };
 
   r.inherits(m, i), t.CstyleBehaviour = m;

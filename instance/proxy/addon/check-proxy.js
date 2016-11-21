@@ -106,70 +106,71 @@ var check_56pu = function (testurl, keywords) {
                           console.log('checking proxy: ' + proxy);
                           httpRequest.request(echo_server_addr, null, null, proxy, 60, false, function (err, status_code, content, page_encoding) {
                             if (err || parseInt(status_code) != 200) {
-                                console.error('Request ' + echo_server_addr + ' error using proxy: ' + proxy + ', status code: ' + status_code + ', Error: ' + err);
-                                try { qcallback(); } catch (e) { console.error('Fucking error: ' + e); }
-                              } else {
-                                if (content.startsWith('{')) {
-                                    try {
-                                        var info = JSON.parse(content);
-                                      } catch (e) {
-                                        console.error('proxy checker: json parse error: ' + proxy);
-                                        return qcallback();
-                                      };
+                              console.error('Request ' + echo_server_addr + ' error using proxy: ' + proxy + ', status code: ' + status_code + ', Error: ' + err);
+                              try { qcallback(); } catch (e) { console.error('Fucking error: ' + e); }
+                            } else {
+                              if (content.startsWith('{')) {
+                                try {
+                                  var info = JSON.parse(content);
+                                } catch (e) {
+                                  console.error('proxy checker: json parse error: ' + proxy);
+                                  return qcallback();
+                                };
 
-                                    var available_proxy = true;
-                                    if (!info['IP'] || !info['HEADERS'])available_proxy = false;
-                                    if (info['HEADERS']) {
-                                        if (info['HEADERS']['REMOTE_ADDR'] && info['HEADERS']['REMOTE_ADDR'] == myip)available_proxy = false;
-                                        if (info['HEADERS']['X-REAL-IP'] && info['HEADERS']['X-REAL-IP'] == myip)available_proxy = false;
+                                var available_proxy = true;
+
+                                if (!info['IP'] || !info['HEADERS'])available_proxy = false;
+                                if (info['HEADERS']) {
+                                  if (info['HEADERS']['REMOTE_ADDR'] && info['HEADERS']['REMOTE_ADDR'] == myip)available_proxy = false;
+                                  if (info['HEADERS']['X-REAL-IP'] && info['HEADERS']['X-REAL-IP'] == myip)available_proxy = false;
                                                             // strict mode
                                                             // if(info['HEADERS']['HTTP_VIA'])available_proxy = false;
                                                             // if(info['HEADERS']['HTTP_X_FORWARDED_FOR'])available_proxy = false;
                                                             // if(info['HEADERS']['X-FORWARDED-FOR'])available_proxy = false;
                                                             // if(info['HEADERS']['X-REAL-IP'])available_proxy = false;
-                                        if (info['HEADERS']['HTTP_X_FORWARDED_FOR'] && info['HEADERS']['HTTP_X_FORWARDED_FOR'].indexOf(myip) > 0)available_proxy = false;
-                                        if (info['HEADERS']['X-FORWARDED-FOR'] && info['HEADERS']['X-FORWARDED-FOR'].indexOf(myip) > 0)available_proxy = false;
-                                      }
+                                  if (info['HEADERS']['HTTP_X_FORWARDED_FOR'] && info['HEADERS']['HTTP_X_FORWARDED_FOR'].indexOf(myip) > 0)available_proxy = false;
+                                  if (info['HEADERS']['X-FORWARDED-FOR'] && info['HEADERS']['X-FORWARDED-FOR'].indexOf(myip) > 0)available_proxy = false;
+                                }
 
-                                    if (available_proxy) {
-                                        if (testurl) {
-                                            httpRequest.request(testurl, null, null, proxy, 120, false, function (err, status_code, content, page_encoding) {
-                                                if (err || parseInt(status_code) != 200) {
-                                                    console.error('Request ' + testurl + 'error using proxy: ' + proxy + ', status code: ' + status_code + ', Error: ' + err);
-                                                    qcallback();
-                                                  } else {
-                                                    if (keywords) {
-                                                        available_proxy = content.indexOf(keywords) > 0;
-                                                      }
-                                                    if (available_proxy) {
-                                                        redis_cli.lpush('proxy:public:available:3s', proxy, function (err, value) {
-                                                            if (!err) {
-                                                                console.log('proxy checker: Append a available proxy: ' + proxy);
-                                                                av_count++;
-                                                              }
-                                                            qcallback();
-                                                          });
-                                                      } else {
-                                                        console.error('Request ' + testurl + 'error using proxy: ' + proxy + ', keywords lacks of: ' + keywords);
-                                                        qcallback();
-                                                      }
-                                                  }
-                                              });
-                                          } else {
-                                            redis_cli.lpush('proxy:public:available:3s', proxy, function (err, value) {
-                                                if (!err) {
-                                                    console.log('proxy checker: Append a available proxy: ' + proxy);
-                                                    av_count++;
-                                                  }
-                                                qcallback();
-                                              });
-                                          }
-                                      } else {
-                                        console.warn('proxy checker: ' + proxy + ' is invalidate proxy!');
+                                if (available_proxy) {
+                                  if (testurl) {
+                                    httpRequest.request(testurl, null, null, proxy, 120, false, function (err, status_code, content, page_encoding) {
+                                      if (err || parseInt(status_code) != 200) {
+                                        console.error('Request ' + testurl + 'error using proxy: ' + proxy + ', status code: ' + status_code + ', Error: ' + err);
                                         qcallback();
+                                      } else {
+                                        if (keywords) {
+                                          available_proxy = content.indexOf(keywords) > 0;
+                                        }
+                                        if (available_proxy) {
+                                          redis_cli.lpush('proxy:public:available:3s', proxy, function (err, value) {
+                                            if (!err) {
+                                              console.log('proxy checker: Append a available proxy: ' + proxy);
+                                              av_count++;
+                                            }
+                                            qcallback();
+                                          });
+                                        } else {
+                                          console.error('Request ' + testurl + 'error using proxy: ' + proxy + ', keywords lacks of: ' + keywords);
+                                          qcallback();
+                                        }
                                       }
-                                  } else { console.error('proxy checker: ' + proxy + ' is unavailable!'); qcallback(); }
-                              }
+                                    });
+                                  } else {
+                                    redis_cli.lpush('proxy:public:available:3s', proxy, function (err, value) {
+                                      if (!err) {
+                                        console.log('proxy checker: Append a available proxy: ' + proxy);
+                                        av_count++;
+                                      }
+                                      qcallback();
+                                    });
+                                  }
+                                } else {
+                                  console.warn('proxy checker: ' + proxy + ' is invalidate proxy!');
+                                  qcallback();
+                                }
+                              } else { console.error('proxy checker: ' + proxy + ' is unavailable!'); qcallback(); }
+                            }
                           });
                         }, 20);
 

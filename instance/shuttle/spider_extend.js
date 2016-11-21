@@ -88,15 +88,16 @@ spider_extend.prototype.__fetchProxy = function (crawled_info) {
 
                   if (available_proxy) {
                     var endTime = (new Date()).getTime();
+
                     if (endTime - startTime <= 60000) {
-                        redis_cli.lpush('proxy:public:available:3s', ip, function (err, value) {
-                            if (!err)logger.debug('proxy checker: Append a proxy: ' + ip);
-                            cb();
-                          });
-                      } else {
-                        logger.warn('proxy checker: ' + ip + ' took a long time: ' + (endTime - startTime) + 'ms, drop it');
+                      redis_cli.lpush('proxy:public:available:3s', ip, function (err, value) {
+                        if (!err)logger.debug('proxy checker: Append a proxy: ' + ip);
                         cb();
-                      }
+                      });
+                    } else {
+                      logger.warn('proxy checker: ' + ip + ' took a long time: ' + (endTime - startTime) + 'ms, drop it');
+                      cb();
+                    }
                   } else {
                     logger.warn('proxy checker: ' + ip + ' is invalidate proxy!');
                     cb();

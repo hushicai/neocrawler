@@ -17,6 +17,7 @@ module.exports = {
     // http://eslint.cn/docs/rules/radix
     radix: "error",
     'one-var': ['error', 'never'],
-    'newline-after-var': ['error', 'always']
+    'newline-after-var': ['error', 'always'],
+    'linebreak-style': ['error', 'unix']
   }
 };
