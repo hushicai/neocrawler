@@ -58,7 +58,9 @@ spider.prototype.assembly = function (callback) {
                 });
     }
   ], function (err, result) {
-    if (callback)callback(null, 'done');
+    if (callback) {
+      callback(null, 'done');
+    }
   });
 };
 /**
@@ -311,7 +313,9 @@ spider.prototype.detectLink = function (link) {
 
   if (this.driller_rules[domain] != undefined) {
     var alias = this.driller_rules[domain];
-    var domain_rules = Object.keys(alias).sort(function (a, b) { return alias[b]['url_pattern'].length - alias[a]['url_pattern'].length; });
+    var domain_rules = Object.keys(alias).sort(function (a, b) {
+      return alias[b]['url_pattern'].length - alias[a]['url_pattern'].length;
+    });
 
     for (var i = 0; i < domain_rules.length; i++) {
       var current_rule = domain_rules[i];

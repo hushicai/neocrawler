@@ -42,8 +42,12 @@ spiderCore.prototype.assembly = function () {
       self.pipeline.assembly(callback);
     },
     function (callback) {
-      if ('assembly' in self.spider_extend)self.spider_extend.assembly(callback);
-      else callback();
+      if ('assembly' in self.spider_extend) {
+        self.spider_extend.assembly(callback);
+      }
+      else {
+        callback();
+      }
     }
   ], function (err, result) {
     self.spider.refreshDrillerRules();
