@@ -18,6 +18,7 @@ module.exports = {
     radix: "error",
     'one-var': ['error', 'never'],
     'newline-after-var': ['error', 'always'],
-    'linebreak-style': ['error', 'unix']
+    'linebreak-style': ['error', 'unix'],
+    'max-len': ["error", 80]
   }
 };

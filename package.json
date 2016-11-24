@@ -44,7 +44,10 @@
   },
   "scripts": {
     "start": "node run.js",
-    "test": "node test/test.js"
+    "test": "node test/test.js",
+    "web": "node run.js -i abc -a config -p 8888",
+    "schedule": "node run.js -i abc -a schedule",
+    "crawl": "node run.js -i abc -a crawl"
   },
   "devDependencies": {
     "eslint": "^3.10.2",

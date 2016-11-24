@@ -58,7 +58,7 @@ webconfig.prototype.launch = function (settings) {
 	  app.use(express.session({secret: '1234567890QWERTY'}));
  	  //
 	  app.use(express.urlencoded());
-	  app.use(express.staticCache({maxObjects: 100, maxLength: 512}));
+	  // app.use(express.staticCache({maxObjects: 100, maxLength: 512}));
 	  app.use(stylus.middleware({
     src: __dirname + '/views',
 		 dest: __dirname + '/public'

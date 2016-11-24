@@ -227,10 +227,10 @@ onmessage = function (e) {
 
       for (var t in e)f(e, t) && R.push(t); if (L) {
         for (var n = 0, r = O; n < r; n++) {
-        var i = A[n];
+          var i = A[n];
 
-        f(e, i) && R.push(i);
-      }
+          f(e, i) && R.push(i);
+        }
       } return R;
     };
   }Date.now || (Date.now = function () { return (new Date()).getTime(); }); if ('0'.split(void 0, 0).length) {

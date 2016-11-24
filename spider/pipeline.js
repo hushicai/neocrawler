@@ -25,7 +25,9 @@ pipeline.prototype.assembly = function (callback) {
   var spiderCore = this.spiderCore;
 
   this.hbase_via_http = false;
-  if (spiderCore.settings['crawled_hbase_conf'] instanceof Array) this.hbase_via_http = true;
+  if (spiderCore.settings['crawled_hbase_conf'] instanceof Array) {
+    this.hbase_via_http = true;
+  }
   if (this.spiderCore.settings['save_content_to_hbase'] === true) {
     if (this.hbase_via_http) {
       this.hbase_cli = hbase_http({
@@ -58,7 +60,9 @@ pipeline.prototype.assembly = function (callback) {
   this.redis_cli0 = spiderCore.spider.redis_cli0;
   this.redis_cli1 = spiderCore.spider.redis_cli1;
   this.redis_cli2 = spiderCore.spider.redis_cli2;
-  if (callback)callback(null, 'done');
+  if (callback) {
+    callback(null, 'done');
+  }
 };
 /**
  * save links to redis db
@@ -571,8 +575,11 @@ pipeline.prototype.save = function (extracted_info, callback) {
   } else {
     async.series([
       function (cb) {
-        if (extracted_info['drill_link'])pipeline.save_links(extracted_info['url'], extracted_info['origin']['version'], extracted_info['drill_link'], extracted_info['drill_relation'], cb);
-        else cb(null);
+        if (extracted_info['drill_link']) {
+          pipeline.save_links(extracted_info['url'], extracted_info['origin']['version'], extracted_info['drill_link'], extracted_info['drill_relation'], cb);
+        } else {
+          cb(null);
+        }
       },
       function (cb) {
         if (pipeline.spiderCore.settings['save_content_to_hbase'] === true && extracted_info['origin']['type'] == 'node') { // type must be node

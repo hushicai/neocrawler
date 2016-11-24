@@ -44,8 +44,7 @@ spiderCore.prototype.assembly = function () {
     function (callback) {
       if ('assembly' in self.spider_extend) {
         self.spider_extend.assembly(callback);
-      }
-      else {
+      } else {
         callback();
       }
     }
